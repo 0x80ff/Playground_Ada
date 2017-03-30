@@ -49,7 +49,7 @@ begin
 	while (True) loop
 		Read_Channel (Channel, Data);
 		exit when To_String(Data) = "END";
-		Put_Line ("Received: " & Data & Character'Val(10));
+		Put_Line (Data);
 		
 	end loop;
 

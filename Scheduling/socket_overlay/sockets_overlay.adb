@@ -38,7 +38,7 @@ package body Sockets_Overlay is
     begin
       Return_String := To_Unbounded_String (Tick'Img);
       Return_String := Trim(Return_String, Ada.Strings.Left);
-      Return_String := "tick=" & Return_String & " " & Event & " " & Data;
+      Return_String := "tick=" & Return_String & " " & Event & " " & "root." & Data;
       return Return_String;
     end To_Marzin_Input_Format;
 
@@ -74,21 +74,19 @@ package body Sockets_Overlay is
       Event_String   : in     Unbounded_String;
       Task_Id_String : in out Unbounded_String)
     is
-      XML_Start_Tag          : Unbounded_String;
-      XML_End_Tag            : Unbounded_String;
+      XML_Start_Tag          : Unbounded_String := To_Unbounded_String("ref=""");
+      XML_End_Tag            : constant  String := """ />";
       XML_Start_Tag_Position : Natural;
       XML_End_Tag_Position   : Natural;
     begin
-      XML_Start_Tag := To_Unbounded_String("ref=""");
-      XML_End_Tag   := To_Unbounded_String(""" />");
       if Event_String = To_Unbounded_String("PREEMPTION") then
         XML_Start_Tag := To_Unbounded_String("<preempted_task ref=""");
       end if;
 
       XML_Start_Tag_Position := Index (XML_String, To_String(XML_Start_Tag)) + To_String(XML_Start_Tag)'Length;
-      XML_End_Tag_Position   := Index (XML_String, To_String(XML_End_Tag)) - 1;
+      XML_End_Tag_Position   := Index (XML_String, XML_End_Tag) - 1;
 
-      Task_Id := Substring (XML_String, XML_Start_Tag_Position, XML_End_Tag_Position);
+      Task_Id_String := Substring (XML_String, XML_Start_Tag_Position, XML_End_Tag_Position);
     end Get_Task_Id_From_XML;
 
 end Sockets_Overlay;
