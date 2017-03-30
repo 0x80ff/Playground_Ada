@@ -1,5 +1,5 @@
-with GNAT.Sockets;                  use GNAT.Sockets;
-with Ada.Strings.Unbounded;     use Ada.Strings.Unbounded;
+with GNAT.Sockets;          use GNAT.Sockets;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_Io;
 with Text_Io;
 
@@ -28,9 +28,9 @@ package Sockets_Overlay is
       XML_String   : in     Unbounded_String;
       Event_String : in out Unbounded_String);
 
-    procedure Get_Task_Name_From_XML (
-      XML_String   : in     Unbounded_String;
-      Event_String : in     Unbounded_String;
-      Task_Name    : in out Unbounded_String);
+    procedure Get_Task_Id_From_XML (
+      XML_String     : in     Unbounded_String;
+      Event_String   : in     Unbounded_String;
+      Task_Id_String : in out Unbounded_String);
     
 end Sockets_Overlay;
