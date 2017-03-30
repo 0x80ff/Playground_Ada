@@ -6,7 +6,7 @@ with unbounded_strings;             use unbounded_strings;
 package body Sockets_Overlay is
     procedure Read_Channel (
     Channel : in out GNAT.Sockets.Stream_Access;
-    Data    :    out Unbounded_String)
+    Data    : out Unbounded_String)
     is
     begin
       Data := To_Unbounded_String (String'Input (Channel));
@@ -68,4 +68,41 @@ package body Sockets_Overlay is
       -- Get the type of event string
       Event_String := Substring (XML_Substring, XML_Start_Tag_Position, XML_End_Tag_Position);
     end Get_Event_String_From_XML;
+
+    procedure Get_Task_Name_From_XML (
+      XML_String   : in     Unbounded_String;
+      Event_String : in     Unbounded_String;
+      Task_Name    : in out Unbounded_String)
+    is
+      Start_Tag : Unbounded_String;
+      End_Tag   : Unbounded_String;
+      XML_Start_Tag_Position        : Natural;
+      XML_End_Tag_Position          : Natural;
+    begin
+      if Event_String = To_Unbounded_String("RUNNING_TASK") then
+        Start_Tag := To_Unbounded_String("ref=""");
+        End_Tag   := To_Unbounded_String(""" />");
+      elsif Event_String = To_Unbounded_String("PREEMPTION") then
+        Start_Tag := To_Unbounded_String("<preempted_task ref=""");
+        End_Tag   := To_Unbounded_String(""" />");
+      elsif Event_String = To_Unbounded_String("END_OF_TASK_CAPACITY") then
+        Start_Tag := To_Unbounded_String("ref=""");
+        End_Tag   := To_Unbounded_String(""" />");
+      elsif Event_String = To_Unbounded_String("TASK_ACTIVATION") then
+        Start_Tag := To_Unbounded_String("ref=""");
+        End_Tag   := To_Unbounded_String(""" />");
+      elsif Event_String = To_Unbounded_String("START_OF_TASK_CAPACITY") then
+        Start_Tag := To_Unbounded_String("ref=""");
+        End_Tag   := To_Unbounded_String(""" />");
+      end if;
+
+      
+      XML_Start_Tag_Position := Index (XML_String, To_String(Start_Tag)) + To_String(Start_Tag)'Length;
+      XML_End_Tag_Position   := Index (XML_String, To_String(End_Tag)) - 1;
+
+      -- Get substring without time_unit_event tag
+      Task_Name := Substring (XML_String, XML_Start_Tag_Position, XML_End_Tag_Position);
+
+    end Get_Task_Name_From_XML;
+
 end Sockets_Overlay;
