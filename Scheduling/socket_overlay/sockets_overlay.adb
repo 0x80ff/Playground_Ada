@@ -81,6 +81,12 @@ package body Sockets_Overlay is
     begin
       if Event_String = To_Unbounded_String("PREEMPTION") then
         XML_Start_Tag := To_Unbounded_String("<preempted_task ref=""");
+      elsif Event_String = To_Unbounded_String("WAIT_FOR_RESOURCE") then
+        XML_Start_Tag := To_Unbounded_String("<wait_for_resource_task ref=""");
+      elsif Event_String = To_Unbounded_String("ALLOCATE_RESOURCE") then
+        XML_Start_Tag := To_Unbounded_String("<allocate_task ref=""");
+      elsif Event_String = To_Unbounded_String("RELEASE_RESOURCE") then
+        XML_Start_Tag := To_Unbounded_String("<release_task ref=""");
       end if;
 
       XML_Start_Tag_Position := Index (XML_String, To_String(XML_Start_Tag)) + To_String(XML_Start_Tag)'Length;
@@ -89,4 +95,27 @@ package body Sockets_Overlay is
       Task_Id_String := Substring (XML_String, XML_Start_Tag_Position, XML_End_Tag_Position);
     end Get_Task_Id_From_XML;
 
+    procedure Get_Resource_Id_From_XML (
+      XML_String         : in     Unbounded_String;
+      Event_String       : in     Unbounded_String;
+      Resource_Id_String : in out Unbounded_String)
+    is
+      XML_Start_Tag          : Unbounded_String := To_Unbounded_String("ref=""");
+      XML_End_Tag            : constant  String := """ />";
+      XML_Start_Tag_Position : Natural;
+      XML_End_Tag_Position   : Natural;
+    begin
+      if Event_String = To_Unbounded_String("WAIT_FOR_RESOURCE") then
+        XML_Start_Tag := To_Unbounded_String("<wait_for_resource ref=""");
+      elsif Event_String = To_Unbounded_String("ALLOCATE_RESOURCE") then
+        XML_Start_Tag := To_Unbounded_String("<allocate_resource ref=""");
+      elsif Event_String = To_Unbounded_String("RELEASE_RESOURCE") then
+        XML_Start_Tag := To_Unbounded_String("<release_resource ref=""");
+      end if;
+
+      XML_Start_Tag_Position := Index (XML_String, To_String(XML_Start_Tag)) + To_String(XML_Start_Tag)'Length;
+      XML_End_Tag_Position   := Index (XML_String, XML_End_Tag, Ada.Strings.Backward) - 1;
+
+      Resource_Id_String := Substring (XML_String, XML_Start_Tag_Position, XML_End_Tag_Position);
+    end Get_Resource_Id_From_XML;
 end Sockets_Overlay;

@@ -32,5 +32,10 @@ package Sockets_Overlay is
       XML_String     : in     Unbounded_String;
       Event_String   : in     Unbounded_String;
       Task_Id_String : in out Unbounded_String);
+
+    procedure Get_Resource_Id_From_XML (
+      XML_String         : in     Unbounded_String;
+      Event_String       : in     Unbounded_String;
+      Resource_Id_String : in out Unbounded_String);
     
 end Sockets_Overlay;
