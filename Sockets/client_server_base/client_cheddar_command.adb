@@ -10,7 +10,7 @@ with Ada.Text_IO.Unbounded_IO; use Ada.Text_IO.Unbounded_IO;
 -- 1) Send it's hostname to the server, get ACK.
 -- 2) Send the numbers from 0 to 10 to the server
 -- 3) Get ACK after each data sended.
-procedure client_cheddar is
+procedure client_cheddar_command is
 	Address : Sock_Addr_Type;
 	Socket  : Socket_Type;
 	Channel : Stream_Access;
@@ -34,7 +34,7 @@ procedure client_cheddar is
 
 begin
 	Address.Addr := Inet_Addr ("192.168.1.34");
-	Address.Port := 5431;
+	Address.Port := 5432;
 	Create_Socket (Socket);
 
 	Set_Socket_Option (Socket, Socket_Level, (Reuse_Address, True));
@@ -47,15 +47,13 @@ begin
 	-- Put_Line (String'Input (Channel));
 
 	while (True) loop
-		Read_Channel (Channel, Data);
+		Put_Line("Enter command:");
+		Write_Channel(Channel, To_Unbounded_String(Get_Line));
 		
+
 		exit when To_String(Data) = "END";
-		if To_String(Data) = "END_OF_SLICE" then
-			Put_Line("End of slice, write CONTINUE to continue: ");
-			Write_Channel(Channel, To_Unbounded_String(Get_Line));
-		end if;
 		Put_Line (Data);
 		
 	end loop;
 
-end client_cheddar;
+end client_cheddar_command;

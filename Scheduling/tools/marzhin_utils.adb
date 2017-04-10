@@ -1,33 +1,30 @@
-with GNAT.Sockets;                  use GNAT.Sockets;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Strings.Unbounded;         use Ada.Strings.Unbounded;
 with unbounded_strings;             use unbounded_strings;
 
-package body Sockets_Overlay is
-    procedure Read_Channel (
-    Channel : in out GNAT.Sockets.Stream_Access;
-    Data    : out Unbounded_String)
+package body Marzhin_Utils is
+	function Get_Resource_Name (
+      Resource_Name : in Unbounded_String)
+      return             Unbounded_String
     is
     begin
-      Data := To_Unbounded_String (String'Input (Channel));
-    end Read_Channel;
+      return Substring(Resource_Name,
+                       Index (Resource_Name, ".", Ada.Strings.Backward),
+                       To_String(Resource_Name)'Length);
+    end Get_Resource_Name;
 
-    procedure Write_Channel (
-      Channel : in out GNAT.Sockets.Stream_Access;
-      Data    : in     Unbounded_String)
-    is
+    procedure Set_To_Marzin_Event (Event_String : in out Unbounded_String) is
     begin
-      String'Output (Channel, To_String(Data));
-    end Write_Channel;
-
-    function Substring (
-      Str  : in Unbounded_String;
-      From : in Natural;
-      To   : in Natural)
-    return Unbounded_String is
-    begin
-      return To_Unbounded_String (To_String (Str) (From..To));
-    end Substring;
+      if      Event_String = To_Unbounded_String("RUNNING_TASK")           then Event_String := To_Unbounded_String("THREAD_STATE_RUNNING");
+        elsif Event_String = To_Unbounded_String("TASK_ACTIVATION")        then Event_String := To_Unbounded_String("THREAD_STATE_READY");
+        elsif Event_String = To_Unbounded_String("PREEMPTION")             then Event_String := To_Unbounded_String("THREAD_STATE_SUSPENDED");
+        elsif Event_String = To_Unbounded_String("START_OF_TASK_CAPACITY") then Event_String := To_Unbounded_String("THREAD_DISPATCH");
+        elsif Event_String = To_Unbounded_String("END_OF_TASK_CAPACITY")   then Event_String := To_Unbounded_String("THREAD_STATE_SUSPENDED");
+        elsif Event_String = To_Unbounded_String("WAIT_FOR_RESOURCE")      then Event_String := To_Unbounded_String("THREAD_STATE_AWAITING_RESOURCE");
+        elsif Event_String = To_Unbounded_String("ALLOCATE_RESOURCE")      then Event_String := To_Unbounded_String("THREAD_GET_RESOURCE");
+        elsif Event_String = To_Unbounded_String("RELEASE_RESOURCE")       then Event_String := To_Unbounded_String("THREAD_RELEASE_RESOURCE");
+      end if;
+    end Set_To_Marzin_Event;
 
     function To_Marzin_Input_Format (
       Tick  : Natural;
@@ -118,4 +115,17 @@ package body Sockets_Overlay is
 
       Resource_Id_String := Substring (XML_String, XML_Start_Tag_Position, XML_End_Tag_Position);
     end Get_Resource_Id_From_XML;
-end Sockets_Overlay;
+
+    procedure Add_Port (
+      Task_Name     : in Unbounded_String;
+      Resource_Name : in Unbounded_String;
+      State_Value   : in Unbounded_String)
+    is
+    begin
+      Ports.Port_Array(Ports.Port_Nb).Task_Data     := Task_Name;
+      Ports.Port_Array(Ports.Port_Nb).Resource_Data := Resource_Name;
+      Ports.Port_Array(Ports.Port_Nb).State_Data    := State_Value;
+      Ports.Port_Nb := Ports.Port_Nb + 1;
+    end Add_Port;
+
+end Marzhin_Utils;
