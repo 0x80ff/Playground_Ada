@@ -32,14 +32,22 @@ procedure client_cheddar_command is
 		String'Output (Channel, To_String(Data));
 	end Write_Channel;
 
+	procedure Open_Connection (
+		Port    : in Port_Type;
+		IpAddr  : in String;
+		Socket  : in out Socket_Type)
+	is
+	begin
+		Address.Addr := Inet_Addr (IpAddr);
+		Address.Port := Port;
+		Create_Socket (Socket);
+
+		Set_Socket_Option (Socket, Socket_Level, (Reuse_Address, True));
+		Connect_Socket (Socket, Address);
+	end Open_Connection;
+
 begin
-	Address.Addr := Inet_Addr ("192.168.1.34");
-	Address.Port := 5432;
-	Create_Socket (Socket);
-
-	Set_Socket_Option (Socket, Socket_Level, (Reuse_Address, True));
-	Connect_Socket (Socket, Address);
-
+	Open_Connection (5432, "192.168.1.34", Socket);
 	Channel := Stream (Socket);
 	--Data    := To_Unbounded_String (Host_Name);
 
@@ -49,7 +57,7 @@ begin
 	while (True) loop
 		Put_Line("Enter command:");
 		Write_Channel(Channel, To_Unbounded_String(Get_Line));
-		
+		--Read_Channel(Channel, Data);
 
 		exit when To_String(Data) = "END";
 		Put_Line (Data);
