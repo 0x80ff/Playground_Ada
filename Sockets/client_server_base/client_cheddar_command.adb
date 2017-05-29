@@ -47,7 +47,7 @@ procedure client_cheddar_command is
 	end Open_Connection;
 
 begin
-	Open_Connection (5432, "192.168.1.34", Socket);
+	Open_Connection (8902, "192.168.1.34", Socket);
 	Channel := Stream (Socket);
 	--Data    := To_Unbounded_String (Host_Name);
 

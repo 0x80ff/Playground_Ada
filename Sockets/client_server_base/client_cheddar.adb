@@ -34,7 +34,7 @@ procedure client_cheddar is
 
 begin
 	Address.Addr := Inet_Addr ("192.168.1.34");
-	Address.Port := 5431;
+	Address.Port := 8901;
 	Create_Socket (Socket);
 
 	Set_Socket_Option (Socket, Socket_Level, (Reuse_Address, True));
@@ -50,10 +50,6 @@ begin
 		Read_Channel (Channel, Data);
 		
 		exit when To_String(Data) = "END";
-		if To_String(Data) = "END_OF_SLICE" then
-			Put_Line("End of slice, write CONTINUE to continue: ");
-			Write_Channel(Channel, To_Unbounded_String(Get_Line));
-		end if;
 		Put_Line (Data);
 		
 	end loop;
