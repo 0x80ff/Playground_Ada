@@ -1,0 +1,39 @@
+    Test_Task_Capacities_Output:
+    declare
+      Output : Unbounded_String;
+    begin
+      Output := Encode_Task_Capacities(Si);
+    end Test_Task_Capacities_Output;
+
+    Test_Task_Capacity_Input:
+    declare
+      Input         : Unbounded_String := To_Unbounded_String("set_task_capacity [task:capacity]");
+      Task_Name     : Unbounded_String;
+      Task_Capacity : Unbounded_String;
+      From : Natural;
+      To : Natural;
+    begin
+      Input := To_Unbounded_String(Get_Command_Value(Input)); -- [task:capacity]
+
+      From := 1;
+      To   := ((Index ( Input, ":"))) - 1;
+      Task_Name := Substring(Input, From , To);
+      Put_Debug("__INFO__ :: String -> {" & Task_Name & "}");
+
+      From := ((Index ( Input, ":"))) + 1;
+      To   := To_String(Input)'Length;
+      Task_Capacity := Substring(Input, From , To);
+      Put_Debug("__INFO__ :: String -> {" & Task_Capacity & "}");
+
+      Put_Debug("__INFO__ :: | Before | Task -> " & Si.Tcbs(0).Tsk.name & " # " & "Capacity -> " & Si.Tcbs(0).Tsk.capacity'Img);
+      
+      Si.Tcbs(0).Tsk.capacity := Si.Tcbs(0).Tsk.capacity - 1;
+      Put_Debug("__INFO__ :: | After | Task -> " & Si.Tcbs(0).Tsk.name & " # " & "Capacity -> " & Si.Tcbs(0).Tsk.capacity'Img);
+
+      for curr_task in 0 .. Si.Number_Of_Tasks - 1 loop
+        if Si.Tcbs(curr_task).Tsk.Name = Task_Name then
+          Put_Debug("__INFO__ :: Found");
+        end if;
+      end loop;
+
+    end Test_Task_Capacity_Input;

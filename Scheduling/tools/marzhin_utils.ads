@@ -1,9 +1,11 @@
+with Scheduler;                     use Scheduler;
 with unbounded_strings;             use unbounded_strings;
 with Ada.Strings.Unbounded;         use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
-with Scheduler;                     use Scheduler;
+
 
 ---------------------------------------------------------------------
+-- Package Marzhin_Utils
 -- This package is used to provide a translation of Cheddar events
 -- format to Marzhin events format since cheddar is currently for
 -- test and study purpose replacing Marzhin in AADLInspector,
@@ -33,6 +35,7 @@ package Marzhin_Utils is
   Ports : Port_List;
 
   ---------------------------------------------------------------------
+  -- Add_Port
   -- Purpose: Add a marzhin port event to the port list.
   ---------------------------------------------------------------------
   procedure Add_Port (
@@ -40,6 +43,10 @@ package Marzhin_Utils is
     Resource_Name : in Unbounded_String;
     State_Value   : in Unbounded_String);
 
+  ---------------------------------------------------------------------
+  -- Encode_Task_Capacities
+  -- Purpose: Encode and return the table of tasks capacities.
+  ---------------------------------------------------------------------
   function Encode_Task_Capacities (
     Si : Scheduling_Information)
   return Unbounded_String;

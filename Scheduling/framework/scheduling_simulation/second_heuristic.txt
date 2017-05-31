@@ -1,0 +1,80 @@
+              -- Second_Heuristic:
+              -- declare
+              --   Number_Of_Tasks_Ended : Tasks_Range := 0;
+              --   Num_Task_Still_Active : Tasks_Range := 0;
+              -- begin
+              -- for num_task in 0 .. Si.Number_Of_Tasks - 1 loop
+              --   Put_Debug("=== MESSAGE :: " & Si.Tcbs(num_task).Tsk.name
+              --                             & "->end_time="
+              --                             & Si.Tcbs(num_task).End_Time'Img
+              --                             & ", wake_up_time="
+              --                             & Si.Tcbs(num_task).Wake_Up_Time'Img
+              --                             & ", rest_of_capacity="
+              --                             & Si.Tcbs(num_task).Rest_Of_Capacity'Img
+              --                             & ", used_capacity="
+              --                             & Si.Tcbs(num_task).Used_Capacity'Img
+              --                             & ", capacity="
+              --                             & Si.Tcbs(num_task).Tsk.capacity'Img);
+              -- end loop;
+
+              -- -- Calculating the number of task which have consumed their capacity for the current job:
+              -- Number_Of_Tasks_Ended := 0;
+              -- for num_task in 0 .. Si.Number_Of_Tasks - 1 loop
+              --   if (Si.Tcbs(num_task).Wake_Up_Time > Current_Time(J)) and 
+              --      (Si.Tcbs(num_task).Rest_Of_Capacity = Si.Tcbs(num_task).Tsk.capacity)
+              --   then
+              --     Number_Of_Tasks_Ended := Number_Of_Tasks_Ended + 1;
+              --     Put_Debug("Number_Of_Tasks_Ended++ = " & Number_Of_Tasks_Ended'Img);
+              --   else
+              --     Num_Task_Still_Active := num_task;
+              --     Put_Debug("Num_Task_Still_Active = " & Num_Task_Still_Active'Img);
+              --   end if;
+              -- end loop;
+
+              -- -- If their is only one job remaining:
+              -- if Number_Of_Tasks_Ended = Si.Number_Of_Tasks - 1 then
+              --   Put_Debug("Two tasks ended, only one remains");
+              --   if (Si.Tcbs(Num_Task_Still_Active).Rest_Of_Capacity > Si.Tcbs(Num_Task_Still_Active).Tsk.capacity - 2) then
+              --     Task_Safety_Unit := Si.Tcbs(Num_Task_Still_Active).Tsk.capacity - 2;
+              --     Put_Debug("Task_Safety_Unit if::" & Task_Safety_Unit'Img);
+              --   end if;
+
+              --   -- If the job have commited his starting event: 
+              --   Put_Debug("Task_Safety_Unit before if::" & Task_Safety_Unit'Img);
+              --   if Si.Tcbs(Num_Task_Still_Active).Wake_Up_Time <= Current_Time(J) and
+              --      Si.Tcbs(Num_Task_Still_Active).Rest_Of_Capacity <= Task_Safety_Unit
+              --   then
+              --     -- Set current time as itself plus the rest of capacity
+              --     Put_Debug("The one remains can jump now");
+              --     Put_Debug("Current_Time:=" & Current_Time(J)'Img);
+              --     Put_Debug("RCa:=" & Si.Tcbs(Num_Task_Still_Active).Rest_Of_Capacity'Img);
+              --     Current_Time(J) := Current_Time(J) + Si.Tcbs(Num_Task_Still_Active).Rest_Of_Capacity;
+              --     Put_Debug("Current_Time after mod:=" & Current_Time(J)'Img);
+
+              --     -- Verify if there is a task job starting earlier than the previous jump time calculation:
+              --     Nearest_Wake_Up_Time := Current_Time(J);
+              --     for num_task in 1 .. Si.Number_Of_Tasks - 1 loop
+              --       if num_task /= Num_Task_Still_Active and Si.Tcbs(num_task).Wake_Up_Time < Current_Time(J) 
+              --       then
+              --         Nearest_Wake_Up_Time := Si.Tcbs(num_task).Wake_Up_Time;
+              --       end if;
+              --     end loop;
+
+              --     -- Update task values:
+              --     Si.Tcbs(Num_Task_Still_Active).Rest_Of_Capacity := Current_Time(J) - Nearest_Wake_Up_Time + 1;
+              --     Si.Tcbs(Num_Task_Still_Active).Used_Capacity := Si.Tcbs(Num_Task_Still_Active).Tsk.capacity - (Current_Time(J) - Nearest_Wake_Up_Time) - 1;
+
+              --     if (Si.Tcbs(Num_Task_Still_Active).Rest_Of_Capacity > 1) then
+              --       Task_Safety_Unit := Si.Tcbs(Num_Task_Still_Active).Rest_Of_Capacity - 2;
+              --     else
+              --       Task_Safety_Unit := 0;
+              --       Put_Debug("INFO SAFETY PUT TO ZERO");
+              --     end if;
+              --     Current_Time(J) := Nearest_Wake_Up_Time;
+
+              --     Last_Current_Time := Current_Time (J);
+              --     goto Continue;
+              --   end if;
+              -- end if;
+
+              -- end Second_Heuristic;

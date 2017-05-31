@@ -1,12 +1,22 @@
+with sets;
+
+with Task_Set;                      use Task_Set;
 with unbounded_strings;             use unbounded_strings;
 with Ada.Strings.Unbounded;         use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
-with Task_Set;                      use Task_Set;
-with Debug;                         use Debug;
-with sets;
+
 use type Task_Set.Tasks_Range;
 
+--#[debug]
+with Debug; use Debug;
 
+
+---------------------------------------------------------------------
+-- Package Marzhin_Utils
+-- Purpose: Contrains types definitions, functions and procedures
+--          usefull for sockets manipulations such as IO and configuration.
+-- Extra: Documentations on methods are putting in the specification file.
+---------------------------------------------------------------------
 package body Marzhin_Utils is
     
   --------------

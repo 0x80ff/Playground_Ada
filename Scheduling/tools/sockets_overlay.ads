@@ -1,8 +1,16 @@
-with GNAT.Sockets;          use GNAT.Sockets;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Text_Io;
 with Ada.Strings.Unbounded.Text_Io;
+
+with Systems;               use Systems;
+with GNAT.Sockets;          use GNAT.Sockets;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
+with Multiprocessor_Services_Interface; use Multiprocessor_Services_Interface;
+use Multiprocessor_Services_Interface.Scheduling_Result_Per_Processor_Package;
+
+use type Multiprocessor_Services_Interface.Scheduling_Table_Range;
+
 
 ---------------------------------------------------------------------
 -- Package Sockets_Overlay
@@ -16,21 +24,44 @@ with Ada.Strings.Unbounded.Text_Io;
 --   connections clients. (clients list)
 ---------------------------------------------------------------------
 package Sockets_Overlay is
-
   Address               : Sock_Addr_Type; 
 
   Server                : Socket_Type;  
-  Data_Socket           : Socket_Type;  
-  Command_Socket        : Socket_Type;  
-  Temp_Socket           : Socket_Type;
   Ack_Socket            : Socket_Type;
+  Data_Socket           : Socket_Type;
+  Command_Socket        : Socket_Type; 
 
+  Ack_Channel           : GNAT.Sockets.Stream_Access;
   Data_Channel          : GNAT.Sockets.Stream_Access;
   Command_Channel       : GNAT.Sockets.Stream_Access;
-  Temp_Channel          : GNAT.Sockets.Stream_Access;
-  Ack_Channel           : GNAT.Sockets.Stream_Access;
 
   Socket_Mode_Activated : Boolean := False;
+
+  -- Sockets selector identifiers:
+  Input_Status          : Selector_Status;
+  Input_Selector        : Selector_Type;
+  Input_Set             : Socket_Set_Type;
+  WSet                  : Socket_Set_Type;
+
+  type Communication_State is (Starting, Running, Ending);
+  AADLInspector_Communication_State : Communication_State := Starting;
+
+  procedure AADLInspector_Data_Communication(
+      Sys              : in     System;
+      Result           : in     Scheduling_Table_Ptr;
+      J                : in     Scheduling_Table_Range;
+      Current_Time     : in     Natural;
+      Last_Time_Mod    : in out Natural;
+      SpeedFactor      : in     Duration;
+      Speed            : in out Duration;
+      Slice_Size       : in out Natural;
+      Exit_Simulation  : in out Boolean);
+
+  ---------------------------------------------------------------------
+  -- Close_Sockets
+  -- Purpose: Close the three sockets used: Ack, Command, Data.
+  ---------------------------------------------------------------------
+  procedure Close_Sockets;
 
   ---------------------------------------------------------------------
   -- Connect_Socket
@@ -134,27 +165,31 @@ package Sockets_Overlay is
   --   states (Before simulation, During simulation and at the end of 
   --   the simulation when the last time is reached) differents
   --   commands can be received and are handled differently.
+
+  -- TODO::Factoriser
   --------------------------------------------------------------------
-  procedure Start_State_Communication (
-    Message_Received : in out Unbounded_String;
-    Message_To_Send  : in out Unbounded_String;
+  procedure AADLInspector_Command_Communication (
     Slice_Size       : in out Natural;
     Last_Time_Mod    : in out Natural;
     Speed            : in out Duration;
-    SpeedFactor      : in     Duration);
+    SpeedFactor      : in     Duration;
+    Exit_Simulation  : in out Boolean);
 
-  procedure Run_State_Communication (
-      Message_Received : in out Unbounded_String;
-      Message_To_Send  : in out Unbounded_String;
-      Slice_Size       : in out Natural;
-      Last_Time_Mod    : in out Natural;
-      Speed            : in out Duration;
-      SpeedFactor      : in     Duration;
-      Exit_Simulation  : in out Boolean);
+  procedure AADLInspector_Command_Start_State_Communication (
+    Slice_Size       : in out Natural;
+    Last_Time_Mod    : in out Natural;
+    Speed            : in out Duration;
+    SpeedFactor      : in     Duration;
+    Exit_Simulation  : in out Boolean);
 
-  procedure End_State_Communication (
-    Message_Received : in out Unbounded_String;
-    Message_To_Send  : in out Unbounded_String;
+  procedure AADLInspector_Command_Run_State_Communication (
+    Slice_Size       : in out Natural;
+    Last_Time_Mod    : in out Natural;
+    Speed            : in out Duration;
+    SpeedFactor      : in     Duration;
+    Exit_Simulation  : in out Boolean);
+
+  procedure AADLInspector_Command_End_State_Communication (
     Slice_Size       : in out Natural;
     Last_Time_Mod    : in out Natural;
     Speed            : in out Duration;
