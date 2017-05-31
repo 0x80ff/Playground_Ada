@@ -6,7 +6,7 @@ package body Heuristics is
 
   function Can_Run(This : in out Heuristic_1; Si : in Scheduling_Information) return Boolean is
   begin
-    Put_Debug("Nothing");
+    Put_Debug("__DEBUG__ :: Can_Run -> Heuristic_1 [Not Implemented]");
     return True;
   end Can_Run;
 
@@ -41,7 +41,7 @@ package body Heuristics is
     return False;
   end Can_Run;
 
-  -----------------------------
+  -----------------------------------------------------------------------------------------------------
   procedure Update_Idle_Times (This : in out Heuristic_1; No_Task : in Boolean; Core_Id : in Natural) is
   begin
     if No_Task then
@@ -72,7 +72,7 @@ package body Heuristics is
   end Increase_Idle_Times;
 
   function Calculate (This : in out Heuristic_1; Si : in Scheduling_Information) return Natural is
-      Nearest_Wake_Up_Time : Natural;
+      Nearest_Wake_Up_Time : Natural := Natural'Last;
   begin
     Put_Debug("__INFO__ :: Number_Of_Valid_Idle_Times -> TRUE");
     for num_task in 1 .. Si.Number_Of_Tasks - 1 loop
@@ -83,6 +83,7 @@ package body Heuristics is
     Put_Debug("__INFO__ :: Nearest_Wake_Up_Time -> " & Nearest_Wake_Up_Time'Img);
     Return Nearest_Wake_Up_Time;
   end Calculate;
+  -----------------------------------------------------------------------------------------------------
 
   function Calculate (This : in out Heuristic_2; Si : in Scheduling_Information) return Natural is
   begin

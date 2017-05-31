@@ -1,6 +1,11 @@
 with unbounded_strings;             use unbounded_strings;
 with Ada.Strings.Unbounded;         use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
+with Task_Set;                      use Task_Set;
+with Debug;                         use Debug;
+with sets;
+use type Task_Set.Tasks_Range;
+
 
 package body Marzhin_Utils is
     
@@ -19,6 +24,23 @@ package body Marzhin_Utils is
     Ports.Port_Array(Ports.Port_Nb).State_Data    := State_Value;
     Ports.Port_Nb := Ports.Port_Nb + 1;
   end Add_Port;
+
+  ----------------------------
+  -- Encode_Task_Capacities --
+  ----------------------------
+  
+  function Encode_Task_Capacities (
+    Si : Scheduling_Information)
+  return Unbounded_String
+  is
+    Output : Unbounded_String;
+  begin
+    for curr_task in 0 .. Si.Number_Of_Tasks - 1 loop
+      Put_Debug("__INFO__ :: Task -> " & Si.Tcbs(curr_task).Tsk.name & " || Capacity -> " & Si.Tcbs(curr_task).Tsk.capacity'Img);
+    end loop;
+    Output := To_Unbounded_String("");
+    return Output;
+  end Encode_Task_Capacities;
 
   -------------------------------
   -- Get_Event_String_From_XML --
@@ -109,6 +131,23 @@ package body Marzhin_Utils is
     Task_Id_String := Substring (XML_String, XML_Start_Tag_Position, XML_End_Tag_Position);
   end Get_Task_Id_From_XML;
 
+  -----------------------
+  -- Is_Resource_Event --
+  -----------------------
+  function Is_Resource_Event (Event_String : in Unbounded_String)
+  return Boolean is
+  begin
+    if Event_String = To_Unbounded_String("WAIT_FOR_RESOURCE")       or
+       Event_String = To_Unbounded_String("ALLOCATE_RESOURCE")       or
+       Event_String = To_Unbounded_String("RELEASE_RESOURCE")        or
+       Event_String = To_Unbounded_String("THREAD_RELEASE_RESOURCE") or
+       Event_String = To_Unbounded_String("THREAD_GET_RESOURCE")     
+    then
+      return True;
+    end if;
+    return False;
+  end Is_Resource_Event;
+
   --------------------------
   -- Set_To_Marzhin_Event --
   --------------------------
@@ -126,9 +165,22 @@ package body Marzhin_Utils is
     end if;
   end Set_To_Marzhin_Event;
 
-  -----------------------------
+  -----------------------------------
+  -- Set_To_Marzhin_Resource_Event --
+  -----------------------------------
+
+  procedure Set_To_Marzhin_Resource_Event (Event_String : in out Unbounded_String) is
+  begin
+    if    Event_String = To_Unbounded_String("THREAD_RELEASE_RESOURCE")  then
+      Event_String := To_Unbounded_String("RESOURCE [lock]->[unlock]");
+    elsif Event_String = To_Unbounded_String("THREAD_GET_RESOURCE")      then
+      Event_String := To_Unbounded_String("RESOURCE [unlock]->[lock]");
+    end if;
+  end Set_To_Marzhin_Resource_Event;
+
+  ------------------------------
   -- To_Marzhin_Output_Format --
-  -----------------------------
+  ------------------------------
 
   function To_Marzhin_Output_Format (
     Tick  : Natural;

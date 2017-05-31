@@ -23,10 +23,12 @@ package Sockets_Overlay is
   Data_Socket           : Socket_Type;  
   Command_Socket        : Socket_Type;  
   Temp_Socket           : Socket_Type;
+  Ack_Socket            : Socket_Type;
 
   Data_Channel          : GNAT.Sockets.Stream_Access;
   Command_Channel       : GNAT.Sockets.Stream_Access;
   Temp_Channel          : GNAT.Sockets.Stream_Access;
+  Ack_Channel           : GNAT.Sockets.Stream_Access;
 
   Socket_Mode_Activated : Boolean := False;
 
@@ -71,7 +73,7 @@ package Sockets_Overlay is
   --   anymore.
   --  
   --   The procedure was locked in a waiting state on reading Inputs from
-  --   AADLInspector. After multiples tests, modifications no solution was
+  --   AADLInspector. After multiples tests and modifications, no solution was
   --   spotted. After internet research on GNAT.Socket documentation and
   --   code documentation of specification and body files no clue on the issue
   --   was found. A network analysis showed unspecifed data before the message
@@ -89,7 +91,7 @@ package Sockets_Overlay is
   --   The function String'Input only accept this format too.
   --  
   --   So, this is a issue that you need to be aware if you try to communicate
-  --   between an Ada program and another program written in an other language.
+  --   between an Ada program and another program written in another language.
   ---------------------------------------------------------------------
   function Read (Client  : in out Socket_Type;
                  Channel : in out Stream_Access) 
@@ -120,6 +122,44 @@ package Sockets_Overlay is
     Port    : in     Port_Type;
     Socket  : in out Socket_Type;
     Channel : in out GNAT.Sockets.Stream_Access);
+
+  ---------------------------------------------------------------------
+  -- Start_State_Communication
+  -- Run_State_Communication
+  -- End_State_Communication
+  --
+  -- Purpose: They're aiming to receive commands from the client and
+  --   send an acknowledgment message on receive. 
+  --   Three functions are used currently because between the three
+  --   states (Before simulation, During simulation and at the end of 
+  --   the simulation when the last time is reached) differents
+  --   commands can be received and are handled differently.
+  --------------------------------------------------------------------
+  procedure Start_State_Communication (
+    Message_Received : in out Unbounded_String;
+    Message_To_Send  : in out Unbounded_String;
+    Slice_Size       : in out Natural;
+    Last_Time_Mod    : in out Natural;
+    Speed            : in out Duration;
+    SpeedFactor      : in     Duration);
+
+  procedure Run_State_Communication (
+      Message_Received : in out Unbounded_String;
+      Message_To_Send  : in out Unbounded_String;
+      Slice_Size       : in out Natural;
+      Last_Time_Mod    : in out Natural;
+      Speed            : in out Duration;
+      SpeedFactor      : in     Duration;
+      Exit_Simulation  : in out Boolean);
+
+  procedure End_State_Communication (
+    Message_Received : in out Unbounded_String;
+    Message_To_Send  : in out Unbounded_String;
+    Slice_Size       : in out Natural;
+    Last_Time_Mod    : in out Natural;
+    Speed            : in out Duration;
+    SpeedFactor      : in     Duration;
+    Exit_Simulation  : in out Boolean);
 
   ---------------------------------------------------------------------
   -- Write_Channel

@@ -47,6 +47,8 @@ package Heuristics is
   function Calculate(This : in out Heuristic_1; Si : in Scheduling_Information) return Natural;
   function Calculate(This : in out Heuristic_2; Si : in Scheduling_Information) return Natural;
 
+
+  -- Idle_Heuristic
   procedure Update_Idle_Times   (This : in out Heuristic_1; No_Task : in Boolean; Core_Id : in Natural);
   procedure Reset_Idle_Times    (This : in out Heuristic_1; Core_Id : in Natural);
   procedure Decrease_Idle_Times (This : in out Heuristic_1; Core_Id : in Natural);

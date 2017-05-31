@@ -1,7 +1,7 @@
 with unbounded_strings;             use unbounded_strings;
 with Ada.Strings.Unbounded;         use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
-
+with Scheduler;                     use Scheduler;
 
 ---------------------------------------------------------------------
 -- This package is used to provide a translation of Cheddar events
@@ -40,6 +40,10 @@ package Marzhin_Utils is
     Resource_Name : in Unbounded_String;
     State_Value   : in Unbounded_String);
 
+  function Encode_Task_Capacities (
+    Si : Scheduling_Information)
+  return Unbounded_String;
+  
   ---------------------------------------------------------------------
   -- Get_Event_String_From_XML
   -- Purpose: Extract the cheddar event name from an xml formatted string.
@@ -69,10 +73,24 @@ package Marzhin_Utils is
     Task_Id_String : in out Unbounded_String);
 
   ---------------------------------------------------------------------
+  -- Is_Resource_Event
+  -- Purpose: Check if the event concern's a resource.
+  ---------------------------------------------------------------------
+  function Is_Resource_Event (Event_String : in Unbounded_String)
+  return Boolean;
+
+  ---------------------------------------------------------------------
   -- Set_To_Marzhin_Event
   -- Purpose: Transform a cheddar event name to a marzhin event name.
   ---------------------------------------------------------------------
   procedure Set_To_Marzhin_Event (Event_String : in out Unbounded_String);
+
+  ---------------------------------------------------------------------
+  -- Set_To_Marzhin_Resource_Event
+  -- Purpose: Transform a resource event to a marzhin lock/unlock 
+  -- event.
+  ---------------------------------------------------------------------
+  procedure Set_To_Marzhin_Resource_Event (Event_String : in out Unbounded_String);
 
   ---------------------------------------------------------------------
   -- To_Marzhin_Output_Format
