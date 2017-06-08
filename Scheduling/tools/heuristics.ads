@@ -36,31 +36,40 @@ package Heuristics is
     with record
       CNTI : Core_No_Task_Info := (others => 0);
       Number_Of_Valid_Idle_Times : Natural := 0;
+      Current_Time : Natural := 0;
     end record;
 
   type Heuristic_2 is new Concrete_Heuristics
     with record
-      Current_Time            : Natural;
-      Task_Id_Still_Active    : Tasks_Range;
-      Active_Task_Safety_Unit : Natural;
+      Commit_Unit : Natural := 0;
+      Current_Time : Natural := 0;
+      Remaining_Task_Id : Tasks_Range := 0;
+      Number_Of_Tasks_Ended : Natural := 0;
     end record;
 
 
 ---------------------- METHODS -------------------------------------------------
   -- Heuristics functions and procedures:
-  function Can_Run(This : in out Heuristic_1; Si : in Scheduling_Information) return Boolean;
-  function Can_Run(This : in out Heuristic_2; Si : in Scheduling_Information) return Boolean;
+  function Can_Run (This : in out Heuristic_1; Si : in Scheduling_Information) return Boolean;
+  function Can_Run (This : in out Heuristic_2; Si : in Scheduling_Information) return Boolean;
 
-  function Calculate(This : in out Heuristic_1; Si : in Scheduling_Information) return Natural;
-  function Calculate(This : in out Heuristic_2; Si : in Scheduling_Information) return Natural;
+  function Calculate (This : in out Heuristic_1; Si : in Scheduling_Information) return Natural;
+  function Calculate (This : in out Heuristic_2; Si : in Scheduling_Information) return Natural;
 
   -- Proper to Heuristic_1::Idle_Heuristic:
-  procedure Update_Idle_Times   (This : in out Heuristic_1; No_Task : in Boolean; Core_Id : in Natural);
-  procedure Reset_Idle_Times    (This : in out Heuristic_1; Core_Id : in Natural);
+  procedure Update_Values   (This : in out Heuristic_1; No_Task : in Boolean; Core_Id : in Natural);
+  procedure Reset_Values    (This : in out Heuristic_1; Core_Id : in Natural);
+  --
   procedure Decrease_Idle_Times (This : in out Heuristic_1; Core_Id : in Natural);
   procedure Increase_Idle_Times (This : in out Heuristic_1; Core_Id : in Natural);
 
 
+  -- Proper to Heuristic_2::Last_Job_Remaining_Heuristic:
+  function  Verify_Pre_Conditions   (This : in out Heuristic_2; Si : in Scheduling_Information) return Boolean;
+  procedure Reset_Values            (This : in out Heuristic_2; Si : in Scheduling_Information);
+  --
+  function Get_Remaining_Task       (This : in out Heuristic_2; Si : in Scheduling_Information; Current_Time : in Natural) return Boolean;
+  function Get_Nearest_Wake_Up_Time (This : in out Heuristic_2; Si : in Scheduling_Information) return Natural;
 ---------------------- HEURISTICS LIST -----------------------------------------
   -- Heuristic list:
   package Heuristic_Lists is new Ada.Containers.Doubly_Linked_Lists (Heuristic_Ptr);
@@ -85,6 +94,6 @@ package Heuristics is
 
 ---------------------- HEURISTICS DECLARATIONS ---------------------------------
   -- Heuristics declarations:
-  Idle_Heuristic : Heuristic_Ptr := new Heuristic_1;
-  -- HR_2 : Heuristic_Ptr := new Heuristic_2;
+  Idle_Heuristic     : Heuristic_Ptr := new Heuristic_1;
+  Last_Job_Heuristic : Heuristic_Ptr := new Heuristic_2;
 end Heuristics;
